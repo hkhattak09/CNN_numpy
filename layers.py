@@ -135,7 +135,7 @@ class Flatten():
     def forward(self,tensor):
         #tensor shape is B,C,H,W
         #output shape is B,C*H*W
-        self.input_dim = (tensor.shape[0],tensor.shape[1],tensor.shape[2],tensor.shape[3])
+        self.input_dim = (tensor.shape[1],tensor.shape[2],tensor.shape[3])
         matrix = tensor.reshape(tensor.shape[0],-1)
         return matrix
     
