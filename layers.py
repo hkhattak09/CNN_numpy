@@ -1,10 +1,13 @@
 import numpy as np
 
 class Linear():
-    def __init__(self,in_nodes,out_nodes,lr=0.01):
+    def __init__(self,in_nodes,out_nodes,lr=0.001):
         self.in_ = in_nodes
         self.out_ = out_nodes
-        self.weight_ = np.random.normal(size=(in_nodes,out_nodes))
+        # self.weight_ = np.random.normal(size=(in_nodes,out_nodes))
+        fan_in_linear = in_nodes
+        std_dev_linear = np.sqrt(2.0 / fan_in_linear)
+        self.weight_ = np.random.normal(loc=0, scale=std_dev_linear, size=(in_nodes,out_nodes))
         self.bias = np.random.normal(size=(1,out_nodes))
         self.input = None
         self.output = None
@@ -24,7 +27,6 @@ class Linear():
         self.weight_ = self.weight_ - self.lr*dw
         self.bias = self.bias - self.lr*db
         return error_signal
-    
 
 
 #Conv2d is being designed to work with square and rectangular matrices.
@@ -35,7 +37,10 @@ class Conv2d():
         self.stride = stride
         self.padding = padding
         self.kernel_size = kernel_size
-        self.kernels = np.random.normal(size=(out_channels,in_channels,kernel_size,kernel_size))
+        # self.kernels = np.random.normal(size=(out_channels,in_channels,kernel_size,kernel_size))
+        fan_in_conv = in_channels * kernel_size * kernel_size
+        std_dev_conv = np.sqrt(2.0 / fan_in_conv)
+        self.kernels = np.random.normal(loc=0, scale=std_dev_conv, size=(out_channels,in_channels,kernel_size,kernel_size))
         self.bias = np.random.normal(size=(out_channels,1,1))
         self.input = None
         self.output = None
@@ -130,7 +135,7 @@ class Flatten():
     def forward(self,tensor):
         #tensor shape is B,C,H,W
         #output shape is B,C*H*W
-        self.input_dim = (tensor.shape[1],tensor.shape[2],tensor.shape[3])
+        self.input_dim = (tensor.shape[0],tensor.shape[1],tensor.shape[2],tensor.shape[3])
         matrix = tensor.reshape(tensor.shape[0],-1)
         return matrix
     
