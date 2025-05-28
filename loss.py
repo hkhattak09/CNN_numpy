@@ -19,5 +19,5 @@ class CEloss():
         y_true = self.ytrue
         y_pred = self.ypred
         batch_size = y_true.shape[0]
-        grad = -y_true / (y_pred * batch_size)
+        grad = -1*y_true / (y_pred * batch_size)
         return grad
