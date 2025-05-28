@@ -1,7 +1,7 @@
 import numpy as np
 
 class Linear():
-    def __init__(self,in_nodes,out_nodes,lr=0.001):
+    def __init__(self,in_nodes,out_nodes,lr=0.01):
         self.in_ = in_nodes
         self.out_ = out_nodes
         self.weight_ = np.random.normal(size=(in_nodes,out_nodes))
