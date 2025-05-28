@@ -28,7 +28,6 @@ class Linear():
         self.bias = self.bias - self.lr*db
         return error_signal
 
-
 #Conv2d is being designed to work with square and rectangular matrices.
 class Conv2d():
     def __init__(self,in_channels,out_channels,kernel_size,stride,padding=0,lr=0.01):
@@ -48,8 +47,8 @@ class Conv2d():
 
     def convolve(self,input_data,kernels,padding,stride,out_channels,bias=False):
         # #conversion to int as np.floor returns a float while indexing requires int.
-        out_H = int(np.floor(((input_data.shape[2] + 2*padding - kernels.shape[2])/stride)+1))
-        out_W = int(np.floor(((input_data.shape[3] + 2*padding - kernels.shape[2])/stride)+1))
+        out_H = int(np.floor(((input_data.shape[2] + 2*padding - kernels.shape[2])/stride))+1)
+        out_W = int(np.floor(((input_data.shape[3] + 2*padding - kernels.shape[2])/stride))+1)
         output_tensor = np.zeros(shape=(input_data.shape[0],out_channels,out_H,out_W))
         if padding != 0:
             tensor = np.pad(input_data,pad_width=((0,0),(0,0),(padding,padding),(padding,padding)),mode='constant',constant_values=0)
@@ -88,7 +87,7 @@ class Conv2d():
     def backward(self,error_signal):
         #error signal is a [batch_size,out_channels,out_dim,out_dim] what you basically have is pd of E wrt to O
         #computing the error signal to back propogate
-        padding_dim = self.kernel_size - 1
+        padding_dim = self.kernel_size - 1 - self.padding
         flipped_kernels = (self.kernels[:,:,::-1,::-1]).transpose(1,0,2,3)
         if self.stride>1:
             dXerror_signal = self.upsample(error_signal)
@@ -96,6 +95,25 @@ class Conv2d():
             dXerror_signal = error_signal
 
         new_errorsignal = self.convolve(dXerror_signal,flipped_kernels,padding=padding_dim,stride=1,out_channels=self.in_channels)
+
+        diff_H = self.input.shape[2] - new_errorsignal.shape[2]
+        diff_W = self.input.shape[3] - new_errorsignal.shape[3]
+
+        if diff_H > 0 or diff_W > 0:
+            pad_H_before = diff_H // 2
+            pad_H_after = diff_H - pad_H_before
+            pad_W_before = diff_W // 2
+            pad_W_after = diff_W - pad_W_before
+            new_errorsignal = np.pad(new_errorsignal,pad_width=((0,0),(0,0),(pad_H_before,pad_H_after),(pad_W_before,pad_W_after)),mode='constant',constant_values=0)
+        elif diff_H < 0 or diff_W < 0:
+            crop_H_start = -diff_H // 2
+            crop_H_end = new_errorsignal.shape[2] - (-diff_H - crop_H_start)
+            crop_W_start = -diff_W // 2
+            crop_W_end = new_errorsignal.shape[3] - (-diff_W - crop_W_start)
+            
+            new_errorsignal = new_errorsignal[:, :, crop_H_start:crop_H_end, crop_W_start:crop_W_end]
+
+        new_errorsignal = new_errorsignal[:, :, :self.input.shape[2], :self.input.shape[3]]
         #weight_update.
         #dw
 
@@ -126,6 +144,7 @@ class Conv2d():
         self.bias = self.bias - self.lr*db
 
         return new_errorsignal
+
 
 
 class Flatten():
