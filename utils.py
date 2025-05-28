@@ -31,7 +31,7 @@ def load_dataset():
 
 
 def compute_accuracy(predictions, targets):
-    return (predictions == np.argmax(targets, axis=1)).mean()
+    return (predictions == (np.argmax(targets, axis=1).reshape(-1,1))).mean()
 
 
 def plot_history(history):

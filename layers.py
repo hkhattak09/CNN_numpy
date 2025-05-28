@@ -8,7 +8,7 @@ class Linear():
         fan_in_linear = in_nodes
         std_dev_linear = np.sqrt(2.0 / fan_in_linear)
         self.weight_ = np.random.normal(loc=0, scale=std_dev_linear, size=(in_nodes,out_nodes))
-        self.bias = np.random.normal(size=(1,out_nodes))
+        self.bias = np.zeros((1,out_nodes))+0.01
         self.input = None
         self.output = None
         self.lr = lr
@@ -41,7 +41,7 @@ class Conv2d():
         fan_in_conv = in_channels * kernel_size * kernel_size
         std_dev_conv = np.sqrt(2.0 / fan_in_conv)
         self.kernels = np.random.normal(loc=0, scale=std_dev_conv, size=(out_channels,in_channels,kernel_size,kernel_size))
-        self.bias = np.random.normal(size=(out_channels,1,1))
+        self.bias = np.zeros((out_channels,1,1))+0.01
         self.input = None
         self.output = None
         self.lr = lr
